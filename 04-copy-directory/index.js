@@ -1,24 +1,18 @@
 const { constants } = require('buffer');
 const fs = require('fs');
+const fsp = fs.promises;
 const path = require("path");
 
 const srcPath = path.join(__dirname, "files");
 const destPath = path.join(__dirname, "files-copy");
 
-fs.access(destPath, constants.F_OK, (err) => {
-  if (err) {
-    createDir();
+fs.access(destPath, constants.F_OK, async (err) => {
+  if (!err) {
+    await fsp.rm(destPath, { recursive: true });
   }
+  await fsp.mkdir(destPath);
   copyDir();
 });
-
-function createDir() {
-  fs.mkdir(destPath, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-}
 
 function copyDir() {
   fs.readdir(srcPath, { withFileTypes: true }, (err, files) => {
